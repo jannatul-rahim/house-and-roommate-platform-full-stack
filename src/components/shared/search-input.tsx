@@ -18,10 +18,15 @@ export function SearchInput({ placeholder = "Search...", paramKey = "search", cl
   const { get, setParams } = useQueryParams();
   const urlValue = get(paramKey) ?? "";
   const [value, setValue] = useState(urlValue);
+  const [syncedUrlValue, setSyncedUrlValue] = useState(urlValue);
   const debounced = useDebounce(value.trim(), 400);
 
   // Keep the box in sync when the URL changes elsewhere (back button, "clear filters").
-  useEffect(() => setValue(urlValue), [urlValue]);
+  // Adjusting state during render avoids an extra effect pass.
+  if (urlValue !== syncedUrlValue) {
+    setSyncedUrlValue(urlValue);
+    setValue(urlValue);
+  }
 
   useEffect(() => {
     if (debounced !== urlValue) setParams({ [paramKey]: debounced || null });

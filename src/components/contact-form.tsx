@@ -36,7 +36,7 @@ export function ContactForm() {
 
   const onSubmit = form.handleSubmit((v) => {
     const body = `${v.message}\n\n— ${v.name} (${v.email})`;
-    window.location.href = `mailto:${siteConfig.supportEmail}?subject=${encodeURIComponent(`[${v.topic}] Message from ${v.name}`)}&body=${encodeURIComponent(body)}`;
+    window.open(`mailto:${siteConfig.supportEmail}?subject=${encodeURIComponent(`[${v.topic}] Message from ${v.name}`)}&body=${encodeURIComponent(body)}`, "_self");
     toast.success("Opening your email app with the message ready to send.");
     form.reset();
   });

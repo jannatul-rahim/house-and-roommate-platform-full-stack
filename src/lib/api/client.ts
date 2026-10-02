@@ -57,6 +57,8 @@ async function request<T>(path: string, options: ClientRequestOptions = {}): Pro
     const err = json as ApiErrorBody | null;
     if (res.status === 401 && typeof window !== "undefined") {
       const redirect = encodeURIComponent(window.location.pathname + window.location.search);
+      // Full reload on purpose: it drops every cached query of the expired session.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
       window.location.assign(`/login?redirect=${redirect}&expired=1`);
     }
     throw new ApiError(res.status, err?.message ?? `Request failed (${res.status})`, err?.errors ?? []);

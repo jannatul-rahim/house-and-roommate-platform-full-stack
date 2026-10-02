@@ -14,8 +14,8 @@ export async function POST(request: Request) {
         parsed.error.issues.map((issue) => ({ path: issue.path.join("."), message: issue.message })),
       );
     }
-    const { confirmPassword: _confirm, phone, ...rest } = parsed.data;
-    const result = await backendAuth.register(env.apiBaseUrl, { ...rest, phone: phone || undefined });
+    const { name, email, password, role, phone } = parsed.data;
+    const result = await backendAuth.register(env.apiBaseUrl, { name, email, password, role, phone: phone || undefined });
     return sessionResponse(result, 201);
   } catch (error) {
     return errorResponse(error);

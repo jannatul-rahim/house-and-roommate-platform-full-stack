@@ -1,7 +1,7 @@
 "use client";
 
 import { SlidersHorizontal } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FilterSelect } from "@/components/shared/filter-select";
 import { ListToolbar } from "@/components/shared/list-toolbar";
 import { SearchInput } from "@/components/shared/search-input";
@@ -22,17 +22,14 @@ export const PROPERTY_SORT_OPTIONS = [
 /** Budget / city / move-in filters kept in a popover so mobile stays tidy. */
 function MoreFilters() {
   const { get, setParams } = useQueryParams();
-  const [draft, setDraft] = useState({ city: "", minPrice: "", maxPrice: "", availableFrom: "" });
+  const fromUrl = () => ({
+    city: get("city") ?? "",
+    minPrice: get("minPrice") ?? "",
+    maxPrice: get("maxPrice") ?? "",
+    availableFrom: get("availableFrom") ?? "",
+  });
+  const [draft, setDraft] = useState(fromUrl);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setDraft({
-      city: get("city") ?? "",
-      minPrice: get("minPrice") ?? "",
-      maxPrice: get("maxPrice") ?? "",
-      availableFrom: get("availableFrom") ?? "",
-    });
-  }, [get]);
 
   const activeCount = ["city", "minPrice", "maxPrice", "availableFrom"].filter((k) => get(k)).length;
 
@@ -51,7 +48,8 @@ function MoreFilters() {
   };
 
   return (
-    <Popover>
+    // Re-seed the draft from the URL each time the popover opens.
+    <Popover onOpenChange={(open) => open && setDraft(fromUrl())}>
       <PopoverTrigger asChild>
         <Button variant="outline" className="h-9 justify-start">
           <SlidersHorizontal /> More filters
