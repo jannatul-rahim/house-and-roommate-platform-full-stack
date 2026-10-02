@@ -96,7 +96,8 @@ export function DonutChart({ data, name = "Total" }: { data: SeriesPoint[]; name
   const total = data.reduce((sum, d) => sum + d.value, 0);
   const visible = data.filter((d) => d.value > 0);
   return (
-    <div className="flex flex-col items-center gap-4 sm:flex-row">
+    <div className="@container">
+    <div className="flex flex-col items-center gap-4 @md:flex-row">
       <div className="relative h-52 w-52 shrink-0" role="img" aria-label={`${name} breakdown`}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -130,6 +131,7 @@ export function DonutChart({ data, name = "Total" }: { data: SeriesPoint[]; name
           </li>
         ))}
       </ul>
+    </div>
     </div>
   );
 }
