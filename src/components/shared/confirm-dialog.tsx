@@ -21,11 +21,18 @@ interface ConfirmDialogProps {
   confirmLabel?: string;
   destructive?: boolean;
   onConfirm: () => Promise<unknown>;
+  /** For dialogs opened programmatically (e.g. from a dropdown item). */
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 /** Confirmation step for irreversible actions; stays open while the request runs. */
-export function ConfirmDialog({ trigger, title, description, confirmLabel = "Confirm", destructive, onConfirm }: ConfirmDialogProps) {
-  const [open, setOpen] = useState(false);
+export function ConfirmDialog({ trigger, title, description, confirmLabel = "Confirm", destructive, onConfirm, defaultOpen = false, onOpenChange }: ConfirmDialogProps) {
+  const [open, setOpenState] = useState(defaultOpen);
+  const setOpen = (next: boolean) => {
+    setOpenState(next);
+    onOpenChange?.(next);
+  };
   const [pending, setPending] = useState(false);
 
   const handleConfirm = async () => {
