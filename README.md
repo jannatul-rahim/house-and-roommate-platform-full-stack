@@ -4,6 +4,13 @@ NestMate is the Next.js frontend for the **PH-6 Housing & Roommate Platform** AP
 
 > Backend repository: `assaignment-6-level-3/PH-6-Housing-and-Roommate-Platform-Backend` (Express + Prisma + PostgreSQL + Stripe).
 
+## 🌐 Live
+
+| | URL |
+|---|---|
+| **Frontend** | https://house-and-roommate-frontend.vercel.app |
+| **Backend API** | https://housing-and-rommate-platform-backen.vercel.app/api/v1 |
+
 ---
 
 ## 🔐 Demo credentials
