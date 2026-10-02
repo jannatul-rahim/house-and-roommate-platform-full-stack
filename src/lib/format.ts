@@ -3,6 +3,7 @@ import { format, formatDistanceToNow, isValid, parseISO } from "date-fns";
 const currencyFormatter = new Intl.NumberFormat("en-BD", {
   style: "currency",
   currency: "BDT",
+  currencyDisplay: "narrowSymbol",
   maximumFractionDigits: 0,
 });
 
