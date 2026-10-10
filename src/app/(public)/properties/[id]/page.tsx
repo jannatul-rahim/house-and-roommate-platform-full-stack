@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: PageProps<"/properties/[id]">
   const description =
     property.description ??
     `${humanize(property.propertyType)} in ${locationLine(property)} with ${property.availableRoomCount} room(s) available on NestMate.`;
-  const cover = propertyGallery(property.id, property.propertyType)[0];
+  const cover = propertyGallery(property.id, property.propertyType, property.images)[0];
   return {
     title: property.title,
     description,
@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: PageProps<"/properties/[id]">
 export default async function PropertyDetailPage({ params }: PageProps<"/properties/[id]">) {
   const { id } = await params;
   const property = await getProperty(id);
-  const gallery = propertyGallery(property.id, property.propertyType);
+  const gallery = propertyGallery(property.id, property.propertyType, property.images).slice(0, 4);
   const rooms = property.rooms ?? [];
 
   const facts = [
@@ -83,7 +83,7 @@ export default async function PropertyDetailPage({ params }: PageProps<"/propert
 
       {/* Gallery */}
       <div className="grid gap-3 md:grid-cols-4 md:grid-rows-2">
-        <div className="relative aspect-[16/10] overflow-hidden rounded-2xl md:col-span-2 md:row-span-2 md:aspect-auto">
+        <div className={`relative aspect-[16/10] overflow-hidden rounded-2xl ${gallery.length > 1 ? "md:col-span-2 md:row-span-2 md:aspect-auto" : "md:col-span-4 md:aspect-[16/7]"}`}>
           <Image src={gallery[0]} alt={property.title} fill priority sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
         </div>
         {gallery.slice(1).map((src, i) => (

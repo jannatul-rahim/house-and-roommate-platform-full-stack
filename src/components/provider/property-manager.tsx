@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { api, useApiAction } from "@/hooks/use-api";
 import { dateInputToIso, formatCurrency, formatDate, humanize, locationLine, toDateInputValue } from "@/lib/format";
+import { PropertyImagesCard } from "@/components/provider/property-images";
 import { propertyCover } from "@/lib/property-media";
 import { availabilitySchema, buildingSchema, propertyBaseSchema, roomSchema, unitSchema } from "@/lib/validations/property";
 import {
@@ -343,7 +344,7 @@ export function PropertyManager({ propertyId }: { propertyId: string }) {
       <Card className="gap-0 overflow-hidden py-0">
         <div className="flex flex-col sm:flex-row">
           <div className="relative aspect-[16/9] sm:aspect-auto sm:w-64">
-            <Image src={propertyCover(p.id, p.propertyType, 600)} alt={p.title} fill sizes="(min-width: 640px) 256px, 100vw" className="object-cover" />
+            <Image src={propertyCover(p.id, p.propertyType, 600, p.images)} alt={p.title} fill sizes="(min-width: 640px) 256px, 100vw" className="object-cover" />
           </div>
           <CardContent className="flex flex-1 flex-col gap-3 p-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -406,6 +407,8 @@ export function PropertyManager({ propertyId }: { propertyId: string }) {
           </CardContent>
         </div>
       </Card>
+
+      <PropertyImagesCard propertyId={p.id} images={p.images ?? []} />
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">

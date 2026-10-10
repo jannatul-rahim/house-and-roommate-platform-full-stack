@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarRange, FileSignature, Wrench } from "lucide-react";
+import { CalendarRange, CheckCircle2, FileSignature, Wrench } from "lucide-react";
 import Link from "next/link";
 import { PropertyRoomCell } from "@/components/dashboard/cells";
 import { PayRentButton } from "@/components/dashboard/pay-rent-button";
@@ -15,12 +15,29 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useListQuery } from "@/hooks/use-api";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { formatCurrency, formatDate } from "@/lib/format";
-import { LEASE_STATUSES, type Lease } from "@/types/api";
+import { LEASE_STATUSES, type Lease, type Payment } from "@/types/api";
+
+function isSameMonth(value: string | null | undefined, now: Date) {
+  if (!value) return false;
+  const date = new Date(value);
+  return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
+}
 
 export function MyLeases() {
   const { get, page } = useQueryParams();
   const query = { page, limit: 6, status: get("status"), sortBy: "createdAt", sortOrder: "desc" };
   const { data, isLoading } = useListQuery<Lease>(["leases", "mine"], "/leases/my-leases", query);
+  const { data: paid } = useListQuery<Payment>(["payments", "mine", "paid-this-month"], "/payments/my-payments", {
+    limit: 100,
+    status: "PAID",
+    sortBy: "paidAt",
+    sortOrder: "desc",
+  });
+
+  const now = new Date();
+  const paidLeaseIds = new Set(
+    (paid?.data ?? []).filter((payment) => isSameMonth(payment.paidAt ?? payment.dueDate, now)).map((payment) => payment.leaseId),
+  );
 
   return (
     <div className="space-y-4">
@@ -57,7 +74,13 @@ export function MyLeases() {
                 </p>
                 {lease.status === "ACTIVE" && (
                   <div className="flex flex-wrap gap-2 border-t pt-4">
-                    <PayRentButton leaseId={lease.id} amount={lease.monthlyRent} />
+                    {paidLeaseIds.has(lease.id) ? (
+                      <span className="inline-flex h-9 items-center gap-2 rounded-md bg-emerald-50 px-3 text-sm font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                        <CheckCircle2 className="size-4" aria-hidden /> Rent paid for {formatDate(now, "MMMM")}
+                      </span>
+                    ) : (
+                      <PayRentButton leaseId={lease.id} amount={lease.monthlyRent} />
+                    )}
                     <Button variant="outline" asChild>
                       <Link href="/dashboard/maintenance">
                         <Wrench /> Report an issue

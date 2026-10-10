@@ -124,7 +124,7 @@ export function MyProperties() {
       cell: (p) => (
         <div className="flex items-center gap-3">
           <div className="relative hidden size-12 shrink-0 overflow-hidden rounded-lg sm:block">
-            <Image src={propertyCover(p.id, p.propertyType, 200)} alt="" fill sizes="48px" className="object-cover" />
+            <Image src={propertyCover(p.id, p.propertyType, 200, p.images)} alt="" fill sizes="48px" className="object-cover" />
           </div>
           <div className="min-w-0">
             <Link href={`/provider/properties/${p.id}`} className="line-clamp-1 font-medium hover:text-primary">

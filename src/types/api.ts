@@ -132,6 +132,11 @@ export interface PublicRoom {
   availability: AvailabilityWindow[];
 }
 
+export interface PropertyImage {
+  id: string;
+  url: string;
+}
+
 export interface PublicProperty {
   id: string;
   title: string;
@@ -148,6 +153,7 @@ export interface PublicProperty {
   minMonthlyRent: number | null;
   maxMonthlyRent: number | null;
   availableRoomCount: number;
+  images?: PropertyImage[];
   /** Only present on the detail endpoint. */
   rooms?: PublicRoom[];
   createdAt: string;
@@ -170,6 +176,7 @@ export interface Property {
   latitude: string | null;
   longitude: string | null;
   status: PropertyStatus;
+  images?: PropertyImage[];
   createdAt: string;
   updatedAt: string;
 }

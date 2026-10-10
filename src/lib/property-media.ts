@@ -1,8 +1,8 @@
-import type { PropertyType } from "@/types/api";
+import type { PropertyImage, PropertyType } from "@/types/api";
 
-// The API has no media fields for properties, so listings are illustrated with
-// curated photography matched to the property type. The pick is derived from
-// the property id, so a listing always shows the same photos.
+// Listings use the photos their owner uploaded. Properties without uploads fall
+// back to curated photography matched to the property type; the pick is derived
+// from the property id, so a listing always shows the same photos.
 const photo = (id: string, width = 1200) =>
   `https://images.unsplash.com/photo-${id}?w=${width}&q=75&auto=format&fit=crop`;
 
@@ -32,12 +32,14 @@ function hash(value: string): number {
   return h;
 }
 
-export function propertyCover(id: string, type: PropertyType, width?: number): string {
+export function propertyCover(id: string, type: PropertyType, width?: number, images?: PropertyImage[]): string {
+  if (images?.length) return images[0].url;
   const list = COVERS[type] ?? COVERS.OTHER;
   return photo(list[hash(id) % list.length], width);
 }
 
-export function propertyGallery(id: string, type: PropertyType): string[] {
+export function propertyGallery(id: string, type: PropertyType, images?: PropertyImage[]): string[] {
+  if (images?.length) return images.map((image) => image.url);
   const start = hash(id) % INTERIORS.length;
   const interiors = [0, 1, 2].map((offset) => photo(INTERIORS[(start + offset) % INTERIORS.length], 800));
   return [propertyCover(id, type, 1600), ...interiors];

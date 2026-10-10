@@ -9,6 +9,7 @@ import { useState } from "react";
 import { Controller, useForm, type FieldPath } from "react-hook-form";
 import { toast } from "sonner";
 import { FormField, fieldAria } from "@/components/shared/form-field";
+import { PhotoPicker, uploadPropertyImages } from "@/components/provider/property-images";
 import { Stepper } from "@/components/shared/stepper";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -29,10 +30,11 @@ const STEPS: { id: string; title: string; fields: Field[] }[] = [
   { id: "location", title: "Location", fields: ["property.address", "property.city", "property.state", "property.country", "property.zipCode"] },
   { id: "unit", title: "Building & unit", fields: ["building.name", "building.description", "unit.unitNumber", "unit.floor", "unit.bedrooms", "unit.bathrooms"] },
   { id: "room", title: "First room", fields: ["room.roomNumber", "room.name", "room.roomType", "room.monthlyRent", "room.securityDeposit", "availability.availableFrom", "availability.availableTo"] },
+  { id: "photos", title: "Photos", fields: [] },
   { id: "review", title: "Review", fields: [] },
 ];
 
-const TASKS = ["Property", "Building", "Unit", "Room", "Availability"] as const;
+const TASKS = ["Property", "Building", "Unit", "Room", "Availability", "Photos"] as const;
 type TaskState = "idle" | "running" | "done" | "error";
 
 const today = toDateInputValue(new Date());
@@ -48,6 +50,7 @@ export function PropertyWizard() {
   const queryClient = useQueryClient();
   const [step, setStep] = useState(0);
   const [tasks, setTasks] = useState<Record<(typeof TASKS)[number], TaskState> | null>(null);
+  const [photos, setPhotos] = useState<File[]>([]);
   const [createdId, setCreatedId] = useState<string | null>(null);
   // Set when a later step fails after the property itself was created.
   const [partialId, setPartialId] = useState<string | null>(null);
@@ -110,6 +113,15 @@ export function PropertyWizard() {
         availableTo: dateInputToIso(values.availability.availableTo, true),
       });
       mark("Availability", "done");
+
+      if (photos.length) {
+        current = "Photos";
+        mark("Photos", "running");
+        await uploadPropertyImages(property.id, photos);
+        mark("Photos", "done");
+      } else {
+        mark("Photos", "done");
+      }
 
       setCreatedId(property.id);
       queryClient.invalidateQueries({ queryKey: ["properties"] });
@@ -300,6 +312,12 @@ export function PropertyWizard() {
             )}
 
             {step === 4 && (
+              <div className="space-y-4">
+                <PhotoPicker files={photos} onChange={setPhotos} />
+              </div>
+            )}
+
+            {step === 5 && (
               <div className="space-y-5">
                 <dl className="grid gap-4 rounded-xl bg-muted/50 p-5 text-sm sm:grid-cols-2">
                   <div className="sm:col-span-2">
@@ -326,6 +344,10 @@ export function PropertyWizard() {
                     <dd className="font-medium">
                       {formatCurrency(v.room.monthlyRent)} / {formatCurrency(v.room.securityDeposit)}
                     </dd>
+                  </div>
+                  <div>
+                    <dt className="text-muted-foreground">Photos</dt>
+                    <dd className="font-medium">{photos.length ? `${photos.length} selected` : "None — a placeholder will be shown"}</dd>
                   </div>
                   <div>
                     <dt className="text-muted-foreground">Availability</dt>
